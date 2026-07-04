@@ -8,39 +8,46 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build Web Export
-        run: npx expo export -p web
+        run: npx expo export --platform web --output-dir dist
+
+      - name: Verify build output
+        run: |
+          test -d dist || (echo "dist folder not found" && exit 1)
+          ls -la dist
 
       - name: Upload build to EC2 home
-        uses: appleboy/scp-action@v0.1.4
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "dist/*"
-          target: "~/payment-collection-frontend"
+          target: "/home/${{ secrets.EC2_USERNAME }}/payment-collection-frontend"
           strip_components: 1
 
       - name: Move build to web root
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e
             sudo mkdir -p /var/www/payment-collection-frontend
-            sudo rsync -av --delete ~/payment-collection-frontend/ /var/www/payment-collection-frontend/
+            sudo rsync -av --delete /home/${{ secrets.EC2_USERNAME }}/payment-collection-frontend/ /var/www/payment-collection-frontend/
             sudo chown -R www-data:www-data /var/www/payment-collection-frontend
