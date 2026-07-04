@@ -1,9 +1,9 @@
 import axios from 'axios';
-import config from '../constants/config';
+import { API_BASE_URL, API_TIMEOUT } from '../constants/config';
 
 const axiosClient = axios.create({
-  baseURL: config.API_BASE_URL,
-  timeout: config.API_TIMEOUT,
+  baseURL: API_BASE_URL,
+  timeout: API_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
   },
