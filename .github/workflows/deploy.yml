@@ -50,4 +50,11 @@ jobs:
             set -e
             sudo mkdir -p /var/www/payment-collection-frontend
             sudo rsync -av --delete /home/${{ secrets.EC2_USERNAME }}/payment-collection-frontend/ /var/www/payment-collection-frontend/
-            sudo chown -R www-data:www-data /var/www/payment-collection-frontend
+
+            if id -u www-data >/dev/null 2>&1; then
+              sudo chown -R www-data:www-data /var/www/payment-collection-frontend
+            elif id -u nginx >/dev/null 2>&1; then
+              sudo chown -R nginx:nginx /var/www/payment-collection-frontend
+            else
+              sudo chown -R ${{ secrets.EC2_USERNAME }}:${{ secrets.EC2_USERNAME }} /var/www/payment-collection-frontend
+            fi
