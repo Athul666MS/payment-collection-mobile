@@ -24,12 +24,23 @@ jobs:
       - name: Build Web Export
         run: npx expo export -p web
 
-      - name: Deploy to EC2 via SSH
+      - name: Upload build to EC2 home
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "dist/*"
-          target: "/var/www/payment-collection-frontend"
+          target: "~/payment-collection-frontend"
           strip_components: 1
+
+      - name: Move build to web root
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo mkdir -p /var/www/payment-collection-frontend
+            sudo rsync -av --delete ~/payment-collection-frontend/ /var/www/payment-collection-frontend/
+            sudo chown -R www-data:www-data /var/www/payment-collection-frontend
