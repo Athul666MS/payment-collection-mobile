@@ -25,7 +25,7 @@ A modern, highly responsive, cross-platform mobile and web application built to 
 
 ## 🎯 Project Overview
 This application provides customers with a seamless, premium interface to:
-- Look up their loan account details using an alphanumeric account number (e.g., `ACC1001`).
+- Look up their loan account details using an alphanumeric account number (e.g., `ACC1001`,`ACC1002`,`ACC1003`).
 - View their **Total Loan Amount**, **Remaining Balance**, and **Monthly EMI Amount**.
 - Track whether the current month's EMI is **Paid** or **Pending**.
 - Make secure, validated EMI payments directly from the app.
